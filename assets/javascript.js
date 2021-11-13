@@ -136,6 +136,7 @@ document.getElementById('next').addEventListener('click', (event) => {
         current_question += 1;
         if(current_question >= questions.length) {
             alert("Congrats you finished!");
+            document.getElementById('quiz').style.display = "none";
             clearInterval(timer);
             return;
         }

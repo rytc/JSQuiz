@@ -123,8 +123,21 @@ const render_question = () => {
 }
 
 const render_highscores = () => {
-    let scores = localStorage.getItem('highscores');
-    document.getElementById('highscores').innerHTML = "<li>" + scores + "</li>"
+    let scores = JSON.parse(localStorage.getItem('highscore'));
+    scores.sort( (a, b) => {
+        if(a.score < b.score) { return 1; }
+        else if(a.score > b.score) { return -1; }
+        else { return 0 };
+    });
+
+    let highscore_list = document.getElementById('highscores');
+
+    for(let i = 0; i < scores.length; i++) {
+        let hs_entry = document.createElement('li');
+        hs_entry.innerHTML = "<strong>" + scores[i].initials + ":</strong> " + scores[i].score;
+        highscore_list.append(hs_entry);
+    }
+
     document.getElementById('highscore_board').style.display = "";
 }
 
@@ -153,8 +166,18 @@ document.getElementById('next').addEventListener('click', (event) => {
             clearInterval(timer);
 
             let initials = prompt("Enter your initials to save your high score: ");
-            let highscores = localStorage.getItem('highscore');
-            localStorage.setItem('highscore', initials + " " + time);
+
+            if(!localStorage.highscore) {
+                localStorage.highscore = "[]";
+            }
+
+            let highscores = JSON.parse(localStorage.highscore);
+            let hs = {
+                initials: initials,
+                score: time
+            };
+            highscores.push(hs);
+            localStorage.highscore = JSON.stringify(highscores);
             render_highscores();
 
             return;

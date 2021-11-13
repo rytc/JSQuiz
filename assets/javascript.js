@@ -103,8 +103,10 @@ let selected_choice = -1;
 let timer = null;
 let time = QUIZ_TIME;
 
+//
+// Populates the quiz div with the question and choices
+//
 const render_question = () => {
-    let quiz_div = document.getElementById('quiz');
     let current_q = questions[current_question];
     let choice_list = document.getElementById('choices');
 
@@ -123,6 +125,8 @@ const render_question = () => {
 }
 
 const render_highscores = () => {
+    document.getElementById('highscores').innerHTML = '';
+
     let scores = JSON.parse(localStorage.getItem('highscore'));
     scores.sort( (a, b) => {
         if(a.score < b.score) { return 1; }
@@ -134,7 +138,8 @@ const render_highscores = () => {
 
     for(let i = 0; i < scores.length; i++) {
         let hs_entry = document.createElement('li');
-        hs_entry.innerHTML = "<strong>" + scores[i].initials + ":</strong> " + scores[i].score;
+        hs_entry.className = "list-group-item";
+        hs_entry.innerHTML = "<strong>#" + (i+1) + "</strong> " + scores[i].initials + " - " + scores[i].score;
         highscore_list.append(hs_entry);
     }
 
@@ -222,4 +227,11 @@ document.getElementById('start_quiz').addEventListener('click', () => {
 
     current_question = 0;
     render_question();
+});
+
+document.getElementById('show_hsboard').addEventListener('click', () => {
+    clearInterval(timer);
+    document.getElementById('timer').innerHTML = "";
+    document.getElementById('quiz').style.display = "none";
+    render_highscores();
 });

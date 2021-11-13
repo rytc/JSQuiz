@@ -122,6 +122,12 @@ const render_question = () => {
     });
 }
 
+const render_highscores = () => {
+    let scores = localStorage.getItem('highscores');
+    document.getElementById('highscores').innerHTML = "<li>" + scores + "</li>"
+    document.getElementById('highscore_board').style.display = "";
+}
+
 document.getElementById('next').addEventListener('click', (event) => {
     if(current_question < questions.length) {
         let selected_answer = 0;
@@ -129,8 +135,15 @@ document.getElementById('next').addEventListener('click', (event) => {
         if(selected_choice != questions[current_question].answer) {
             time -= 10;
             document.getElementById('timer').innerHTML = "Time: " + time;
-            document.getElementById('error').innerHTML = "Wrong answer! -10s";
+            let error = document.getElementById('error');
+            error.innerHTML = "Wrong answer! -10s";
+            error.style = "color: red";
             return;
+        } else {
+            let error = document.getElementById('error');
+            error.innerHTML = "Correct!";
+            error.style = "color: green";
+
         }
 
         current_question += 1;
@@ -138,6 +151,12 @@ document.getElementById('next').addEventListener('click', (event) => {
             alert("Congrats you finished!");
             document.getElementById('quiz').style.display = "none";
             clearInterval(timer);
+
+            let initials = prompt("Enter your initials to save your high score: ");
+            let highscores = localStorage.getItem('highscore');
+            localStorage.setItem('highscore', initials + " " + time);
+            render_highscores();
+
             return;
         }
 
@@ -161,7 +180,7 @@ document.getElementById('start_quiz').addEventListener('click', () => {
     document.getElementById('quiz').style.display = "";
     document.getElementById('timer').innerHTML = "Time: " + time;
     document.getElementById('error').innerHTML = "";
-
+    document.getElementById('highscore_board').style.display = "none";
     if(timer !== null) {
         clearInterval(timer);
     }

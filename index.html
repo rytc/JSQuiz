@@ -15,7 +15,6 @@
                 subtracts time from the timer! Can you finish before the timer runs out? You have
                 60 seconds to answer them all!
             </p>
-            <p id="timer"></p>
             <p class="lead">
                 <button class="btn btn-primary btn-lg m-2" id="start_quiz">Start quiz</button>
                 <button class="btn btn-secondary m-2" id="show_hsboard">Show Highscores</button>
@@ -25,6 +24,7 @@
         </div>
 
         <div id="quiz" style="display:none;">
+            <p id="timer"></p>
             <h3 id="question"></h3>
             <ul id="choices" class="list-group"></ul>
             <h4 id="feedback" class="m-2"></h3>
@@ -32,7 +32,7 @@
         <div id="hs_entry" style="display: none;">
             <h3>Congrats! You finished!</h3>
             <p id="score_at_finish"></p>
-            <label for="initials">Initials</label>
+            <label for="initials">Initials:</label>
             <input type="text" id="initials">
             <button type="button" class="btn btn-primary" id="save_score">Save score</button>
         </div>

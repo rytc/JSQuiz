@@ -153,6 +153,12 @@ const populate_question = () => {
     });
 }
 
+const display_hs_entry = () => {
+    document.getElementById('quiz').style = "display:none";
+    document.getElementById('score_at_finish').innerHTML = "Score: " + timer.time;
+    document.getElementById('hs_entry').style = "";
+}
+
 const display_highscores = () => {
     document.getElementById('highscores').innerHTML = '';
 
@@ -162,9 +168,8 @@ const display_highscores = () => {
             return 1; 
         } else if(a.score > b.score) { 
             return -1; 
-        } else { 
-            return 0 
-        };
+        }
+        return 0 
     });
 
     let highscore_list = document.getElementById('highscores');
@@ -188,34 +193,21 @@ const end_quiz = () => {
             localStorage.highscore = "[]";
         }
 
-        // TODO: use a form instead of prompts
-        alert("Congrats you finished!");
-        let initials = prompt("Enter your initials to save your high score: ");
-
-
-        let highscores = JSON.parse(localStorage.highscore);
-        let hs = {
-            initials: initials,
-            score: timer.time
-        };
-        highscores.push(hs);
-        localStorage.highscore = JSON.stringify(highscores);
+        display_hs_entry();
+    } else {
+        display_highscores();
     }
-
-    display_highscores();
 }
 
 const set_feedback = (type) => {
+    let feedback = document.getElementById('feedback');
     if(type === "wrong") {
-        let feedback = document.getElementById('feedback');
         feedback.innerHTML = "Wrong answer! -10s";
         feedback.style = "color: red";
     } else if(type == "correct") {
-        let feedback = document.getElementById('feedback');
         feedback.innerHTML = "Correct!";
         feedback.style = "color: green";
     } else {
-        let feedback = document.getElementById('feedback');
         feedback.style = "display: none";
     }
 }
@@ -250,3 +242,16 @@ document.getElementById('show_hsboard').addEventListener('click', () => {
     document.getElementById('quiz').style.display = "none";
     display_highscores();
 });
+
+document.getElementById('save_score').addEventListener('click', () => {
+    let initials = document.getElementById('initials').value;
+    let highscores = JSON.parse(localStorage.highscore);
+    let hs = {
+        initials: initials,
+        score: timer.time
+    };
+    highscores.push(hs);
+    localStorage.highscore = JSON.stringify(highscores);
+    document.getElementById('hs_entry').style = "display:none";
+    display_highscores();
+})

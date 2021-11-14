@@ -106,7 +106,6 @@ const questions = [
 ];
 
 const on_choice_selected = (event) => {
-    
     if(event.target.dataset.index != questions[current_question].answer) {
         timer.time -= 10;
         timer.time = Math.max(timer.time, 0); // Stop the timer from going negative
@@ -117,18 +116,16 @@ const on_choice_selected = (event) => {
 
         document.getElementById('timer').innerHTML = "Time: " + timer.time;
         set_feedback('wrong');
-        return;
+    } else {
+        set_feedback('correct');    
+
+        current_question += 1;
+        if(current_question >= questions.length) {
+            end_quiz(); 
+            return;
+        }
+        populate_question();
     } 
-
-    set_feedback('correct');    
-
-    current_question += 1;
-    if(current_question >= questions.length) {
-        end_quiz(); 
-        return;
-    }
-
-    populate_question();
 }
 
 //
@@ -201,7 +198,7 @@ const end_quiz = () => {
 const set_feedback = (type) => {
     let feedback = document.getElementById('feedback');
     if(type === "wrong") {
-        feedback.innerHTML = "Wrong answer! -10s";
+        feedback.innerHTML = "Wrong answer!";
         feedback.style.color = "red";
     } else if(type == "correct") {
         feedback.innerHTML = "Correct!";

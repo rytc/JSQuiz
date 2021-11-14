@@ -1,3 +1,13 @@
+const LIST_ITEM_CLASS_DEFAULT = "choice list-group-item list-group-item-action";
+const QUIZ_TIME = 60
+let current_question = 0;
+
+// These are const because the object shouldn't change
+// but we can still update the members
+const timer = {
+    handle: null,
+    time: QUIZ_TIME
+};
 
 const questions = [
     { // 1
@@ -95,18 +105,36 @@ const questions = [
     }
 ];
 
-const LIST_ITEM_CLASS_DEFAULT = "choice list-group-item list-group-item-action";
-const QUIZ_TIME = 60
+const on_choice_selected = (event) => {
+    
+    if(event.target.dataset.index != questions[current_question].answer) {
+        timer.time -= 10;
+        timer.time = Math.max(timer.time, 0); // Stop the timer from going negative
 
-let current_question = 0;
-let selected_choice = -1;
-let timer = null;
-let time = QUIZ_TIME;
+        if(timer.time <= 0) {
+            end_quiz();
+        }
+
+        document.getElementById('timer').innerHTML = "Time: " + timer.time;
+        set_feedback('wrong');
+        return;
+    } 
+
+    set_feedback('correct');    
+
+    current_question += 1;
+    if(current_question >= questions.length) {
+        end_quiz(); 
+        return;
+    }
+
+    populate_question();
+}
 
 //
 // Populates the quiz div with the question and choices
 //
-const render_question = () => {
+const populate_question = () => {
     let current_q = questions[current_question];
     let choice_list = document.getElementById('choices');
 
@@ -121,17 +149,22 @@ const render_question = () => {
         choice_list_item.dataset.index = i;
         choice_list_item.innerHTML = choice;
         choice_list.append(choice_list_item);
+        choice_list_item.addEventListener('click', on_choice_selected);
     });
 }
 
-const render_highscores = () => {
+const display_highscores = () => {
     document.getElementById('highscores').innerHTML = '';
 
     let scores = JSON.parse(localStorage.getItem('highscore'));
-    scores.sort( (a, b) => {
-        if(a.score < b.score) { return 1; }
-        else if(a.score > b.score) { return -1; }
-        else { return 0 };
+    scores.sort((a, b) => {
+        if(a.score < b.score) { 
+            return 1; 
+        } else if(a.score > b.score) { 
+            return -1; 
+        } else { 
+            return 0 
+        };
     });
 
     let highscore_list = document.getElementById('highscores');
@@ -146,92 +179,74 @@ const render_highscores = () => {
     document.getElementById('highscore_board').style.display = "";
 }
 
-document.getElementById('next').addEventListener('click', (event) => {
-    if(current_question < questions.length) {
-        let selected_answer = 0;
+const end_quiz = () => {
+    clearInterval(timer.handle);
+    document.getElementById('quiz').style.display = "none";
 
-        if(selected_choice != questions[current_question].answer) {
-            time -= 10;
-            document.getElementById('timer').innerHTML = "Time: " + time;
-            let error = document.getElementById('error');
-            error.innerHTML = "Wrong answer! -10s";
-            error.style = "color: red";
-            return;
-        } else {
-            let error = document.getElementById('error');
-            error.innerHTML = "Correct!";
-            error.style = "color: green";
-
+    if(timer.time > 0) {
+        if(!localStorage.highscore) {
+            localStorage.highscore = "[]";
         }
 
-        current_question += 1;
-        if(current_question >= questions.length) {
-            alert("Congrats you finished!");
-            document.getElementById('quiz').style.display = "none";
-            clearInterval(timer);
+        // TODO: use a form instead of prompts
+        alert("Congrats you finished!");
+        let initials = prompt("Enter your initials to save your high score: ");
 
-            let initials = prompt("Enter your initials to save your high score: ");
 
-            if(!localStorage.highscore) {
-                localStorage.highscore = "[]";
-            }
-
-            let highscores = JSON.parse(localStorage.highscore);
-            let hs = {
-                initials: initials,
-                score: time
-            };
-            highscores.push(hs);
-            localStorage.highscore = JSON.stringify(highscores);
-            render_highscores();
-
-            return;
-        }
-
-        render_question();
+        let highscores = JSON.parse(localStorage.highscore);
+        let hs = {
+            initials: initials,
+            score: timer.time
+        };
+        highscores.push(hs);
+        localStorage.highscore = JSON.stringify(highscores);
     }
-});
 
-document.addEventListener('click', (event) => {
-    if(event.target.className.split(' ').includes('choice')) {
-        let choice_list = document.getElementById('choices');
-        choice_list.childNodes.forEach((node, i) => {
-            node.classList = LIST_ITEM_CLASS_DEFAULT; 
-        });
-        selected_choice = event.target.dataset.index;
-        event.target.classList += " active";
-        document.getElementById('error').innerHTML = "";
+    display_highscores();
+}
+
+const set_feedback = (type) => {
+    if(type === "wrong") {
+        let feedback = document.getElementById('feedback');
+        feedback.innerHTML = "Wrong answer! -10s";
+        feedback.style = "color: red";
+    } else if(type == "correct") {
+        let feedback = document.getElementById('feedback');
+        feedback.innerHTML = "Correct!";
+        feedback.style = "color: green";
+    } else {
+        let feedback = document.getElementById('feedback');
+        feedback.style = "display: none";
     }
-});
+}
 
 document.getElementById('start_quiz').addEventListener('click', () => {
-    document.getElementById('quiz').style.display = "";
-    document.getElementById('timer').innerHTML = "Time: " + time;
-    document.getElementById('error').innerHTML = "";
-    document.getElementById('highscore_board').style.display = "none";
-    if(timer !== null) {
-        clearInterval(timer);
+    if(timer.handle !== null) {
+        clearInterval(timer.handle);
     }
-    time = QUIZ_TIME;
-    timer = setInterval(() => {
-        time -= 1;
-        document.getElementById('timer').innerHTML = "Time: " + time;
-        if(time <= 0) {
-            alert("Time is up! Game over");
-            document.getElementById('quiz').style.display = "none";
-            document.getElementById('timer').innerHTML = "";
-            clearInterval(timer);
+
+    timer.time = QUIZ_TIME;
+
+    timer.handle = setInterval(() => {
+        timer.time -= 1;
+        document.getElementById('timer').innerHTML = "Time: " + timer.time;
+        if(timer.time <= 0) {
+            end_quiz();
         }
     }, 1000);
 
+    document.getElementById('quiz').style.display = "";
+    document.getElementById('timer').innerHTML = "Time: " + timer.time;
+    document.getElementById('feedback').innerHTML = "";
+    document.getElementById('highscore_board').style.display = "none";
 
     current_question = 0;
-    render_question();
+    populate_question();
 });
 
 document.getElementById('show_hsboard').addEventListener('click', () => {
-    clearInterval(timer);
+    clearInterval(timer.handle);
     document.getElementById('timer').innerHTML = "";
     document.getElementById('quiz').style.display = "none";
-    render_highscores();
+    display_highscores();
 });

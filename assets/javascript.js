@@ -145,7 +145,7 @@ const populate_question = () => {
     current_q.choices.forEach( (choice, i) => {
         let choice_list_item = document.createElement('li');
         choice_list_item.classList = LIST_ITEM_CLASS_DEFAULT; 
-        choice_list_item.style = "cursor: pointer;"
+        choice_list_item.style.cursor = "pointer;";
         choice_list_item.dataset.index = i;
         choice_list_item.innerHTML = choice;
         choice_list.append(choice_list_item);
@@ -154,9 +154,9 @@ const populate_question = () => {
 }
 
 const display_hs_entry = () => {
-    document.getElementById('quiz').style = "display:none";
+    document.getElementById('quiz').style.display = "none";
     document.getElementById('score_at_finish').innerHTML = "Score: " + timer.time;
-    document.getElementById('hs_entry').style = "";
+    document.getElementById('hs_entry').style.display = "";
 }
 
 const display_highscores = () => {
@@ -169,7 +169,7 @@ const display_highscores = () => {
         } else if(a.score > b.score) { 
             return -1; 
         }
-        return 0 
+        return 0;
     });
 
     let highscore_list = document.getElementById('highscores');
@@ -192,7 +192,6 @@ const end_quiz = () => {
         if(!localStorage.highscore) {
             localStorage.highscore = "[]";
         }
-
         display_hs_entry();
     } else {
         display_highscores();
@@ -203,12 +202,12 @@ const set_feedback = (type) => {
     let feedback = document.getElementById('feedback');
     if(type === "wrong") {
         feedback.innerHTML = "Wrong answer! -10s";
-        feedback.style = "color: red";
+        feedback.style.color = "red";
     } else if(type == "correct") {
         feedback.innerHTML = "Correct!";
-        feedback.style = "color: green";
+        feedback.style.color = "green";
     } else {
-        feedback.style = "display: none";
+        feedback.style.display = "none";
     }
 }
 
@@ -231,6 +230,7 @@ document.getElementById('start_quiz').addEventListener('click', () => {
     document.getElementById('timer').innerHTML = "Time: " + timer.time;
     document.getElementById('feedback').innerHTML = "";
     document.getElementById('highscore_board').style.display = "none";
+    document.getElementById('hs_entry').style.display = "none";
 
     current_question = 0;
     populate_question();
@@ -252,6 +252,6 @@ document.getElementById('save_score').addEventListener('click', () => {
     };
     highscores.push(hs);
     localStorage.highscore = JSON.stringify(highscores);
-    document.getElementById('hs_entry').style = "display:none";
+    document.getElementById('hs_entry').style.display = "display:none";
     display_highscores();
-})
+});

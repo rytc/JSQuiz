@@ -145,7 +145,7 @@ const populate_question = () => {
     current_q.choices.forEach( (choice, i) => {
         let choice_list_item = document.createElement('li');
         choice_list_item.classList = LIST_ITEM_CLASS_DEFAULT; 
-        choice_list_item.style.cursor = "pointer;";
+        choice_list_item.style.cursor = "pointer";
         choice_list_item.dataset.index = i;
         choice_list_item.innerHTML = choice;
         choice_list.append(choice_list_item);
